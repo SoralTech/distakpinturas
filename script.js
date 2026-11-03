@@ -13,6 +13,48 @@ const observer = new IntersectionObserver(entries => entries.forEach(entry => { 
 document.querySelectorAll('.reveal').forEach(element => observer.observe(element));
 document.getElementById('year').textContent = new Date().getFullYear();
 
+// Permite visualizar os trabalhos em tamanho maior sem sair da página.
+const lightbox = document.querySelector('.image-lightbox');
+const lightboxImage = document.querySelector('.lightbox-image');
+const lightboxClose = document.querySelector('.lightbox-close');
+const portfolioImages = document.querySelectorAll('.portfolio-card:not(.portfolio-card-placeholder) img');
+let lastFocusedImage = null;
+
+const closeLightbox = () => {
+  if (!lightbox || lightbox.hidden) return;
+  lightbox.hidden = true;
+  document.body.classList.remove('lightbox-open');
+  lastFocusedImage?.focus();
+};
+
+const openLightbox = (image) => {
+  if (!lightbox || !lightboxImage) return;
+  lastFocusedImage = image;
+  lightboxImage.src = image.currentSrc || image.src;
+  lightboxImage.alt = image.alt;
+  lightbox.hidden = false;
+  document.body.classList.add('lightbox-open');
+  lightboxClose?.focus();
+};
+
+portfolioImages.forEach(image => {
+  image.addEventListener('click', () => openLightbox(image));
+  image.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openLightbox(image);
+    }
+  });
+});
+
+lightbox?.addEventListener('click', event => {
+  if (event.target.matches('[data-lightbox-close]')) closeLightbox();
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') closeLightbox();
+});
+
 
 // Exibe o atalho do WhatsApp assim que a pessoa começa a rolar a página.
 const floatingWhatsApp = document.querySelector('.floating-whatsapp');
